@@ -1,0 +1,21 @@
+﻿@page
+@using Server.Services.DataService
+@inject TenantBaseAppDbContext context
+@{
+}
+
+<html>
+<head>
+
+</head>
+<body>
+<div>
+    <ul>
+        @foreach(var item in context.Products)
+        {
+            <li>@item.Id @item.Name @item.Tenant</li>
+        }
+        </ul>
+    </div>
+</body>
+</html>
