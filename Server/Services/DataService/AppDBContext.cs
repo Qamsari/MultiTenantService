@@ -20,7 +20,16 @@ namespace Server.Services.DataService
                     new Product() {Id=5, Tenant = "localhost:1552", Name = "Product1552-1" },
                     new Product() {Id=6, Tenant = "localhost:1552", Name = "Product1552-2" },
                     new Product() {Id=7, Tenant = "localhost:1552", Name = "Product1552-3" },
-                    new Product() {Id=8, Tenant = "localhost:1552", Name = "Product1552-4" }
+                    new Product() {Id=8, Tenant = "localhost:1552", Name = "Product1552-4" },
+                    new Product() { Id = 9, Tenant = "bitbug.ir", Name = "bitbug.ir -4" },
+                    new Product() { Id = 10, Tenant = "bitbug.ir", Name = "bitbug.ir 2-4" },
+                    new Product() { Id = 11, Tenant = "bitbug.ir", Name = "bitbug.ir -4" },
+                    new Product() { Id = 12, Tenant = "bitbug.ir", Name = "bitbug.ir -4" },
+                    new Product() { Id = 13, Tenant = "codementors.ir", Name = "codementors.ir -4" },
+                    new Product() { Id = 14, Tenant = "codementors.ir", Name = "codementors.ir 2-4" },
+                    new Product() { Id = 15, Tenant = "codementors.ir", Name = "codementors.ir -4" },
+                    new Product() { Id = 16, Tenant = "codementors.ir", Name = "codementors.ir -4" }
+
                     );
                 context.SaveChanges();
             });
@@ -39,6 +48,7 @@ namespace Server.Services.DataService
     {
         private readonly ITenantAccessor _tenantAccessor;
 
+        public string? Tenant => _tenantAccessor.Tenant;
         public TenantBaseAppDbContext(DbContextOptions<TenantBaseAppDbContext> dbContextOptions,ITenantAccessor tenantAccessor) : base(dbContextOptions)
         {
             _tenantAccessor = tenantAccessor;

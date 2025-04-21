@@ -4,6 +4,6 @@
     {
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public string? Tenant => _httpContextAccessor.HttpContext?.Request.Host.Value;
+        public string? Tenant => _httpContextAccessor.HttpContext?.Request.Host.Value.Replace("www.","");
     }
 }
