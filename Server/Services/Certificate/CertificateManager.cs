@@ -26,14 +26,30 @@ namespace Server.Services.Certificate
         public CertificateManager(IOptions<CertificateManagerOptions> options,ILogger<CertificateManager> logger)
         {
             _logger = logger;
-            foreach (var certificatePath in Directory.GetFiles(options.Value.Path, "*.pem"))
+            //foreach (var certificatePath in Directory.GetFiles(options.Value.Path, "*.pem"))
+            //{
+            //    try
+            //    {
+            //        var host = Path.GetFileNameWithoutExtension(certificatePath).ToLower();
+            //        var privateKeyPath = $"{Path.GetDirectoryName(certificatePath)}\\{host}.key";
+            //        var cert = CreateCertificateFromPem(certificatePath, privateKeyPath,host);
+            //        _logger.LogInformation("Certificate for {Host} loaded... ({f1},{f2})", host,certificatePath,privateKeyPath);
+            //        _storage.Add(host, cert);
+            //        _storage.Add($"www.{host}", cert);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        _logger.LogError(ex, "Error in load certificate for {Path}", certificatePath);
+            //    }
+            //}
+
+            foreach (var certificatePath in Directory.GetFiles(options.Value.Path, "*.pfx"))
             {
                 try
                 {
                     var host = Path.GetFileNameWithoutExtension(certificatePath).ToLower();
-                    var privateKeyPath = $"{Path.GetDirectoryName(certificatePath)}\\{host}.key";
-                    var cert = CreateCertificateFromPem(certificatePath, privateKeyPath,host);
-                    _logger.LogInformation("Certificate for {Host} loaded... ({f1},{f2})", host,certificatePath,privateKeyPath);
+                    var cert = X509CertificateLoader.LoadPkcs12FromFile(certificatePath, host);
+                    _logger.LogInformation("Certificate for {Host} loaded from {f1}", host, certificatePath);
                     _storage.Add(host, cert);
                     _storage.Add($"www.{host}", cert);
                 }
@@ -54,53 +70,26 @@ namespace Server.Services.Certificate
            return  _storage.TryGetValue(host.ToLower(), out var cert) ? cert : null;
         }
 
-        //private X509Certificate2 CreateCertificateFromPem(string certificatePath, string privateKeyPath,string host)
+        //private X509Certificate2 CreateCertificateFromPem(string certificatePath, string privateKeyPath, string host)
         //{
-        //        var certificate = new X509Certificate2(certificatePath);
-        //        var rsa = RSA.Create();
-        //        var keyContent = File.ReadAllText(privateKeyPath);
-        //        rsa.ImportFromPem(keyContent);
-        //        var rsaPersistent = new RSACryptoServiceProvider();
-        //        rsaPersistent.ImportParameters(rsa.ExportParameters(true));
-        //        rsa.Dispose();
-        //        rsa = rsaPersistent;
+        //    var certificate = new X509Certificate2(certificatePath);
+        //    var rsa = RSA.Create();
+        //    var keyContent = File.ReadAllText(privateKeyPath);
+        //    rsa.ImportFromPem(keyContent);
+        //    var cspParameters = new CspParameters()
+        //    {
+        //        KeyContainerName = host,
+        //        Flags = CspProviderFlags.UseNonExportableKey,
+        //    };
+        //    var rsaPersistent = new RSACryptoServiceProvider(cspParameters);
+        //    rsaPersistent.ImportParameters(rsa.ExportParameters(true));
+        //    rsa.Dispose();
+        //    rsa = rsaPersistent;
 
-        //        return certificate.CopyWithPrivateKey(rsa);
-
+        //    return certificate.CopyWithPrivateKey(rsa);
+    
         //}
 
-        private X509Certificate2 CreateCertificateFromPem(string certificatePath, string privateKeyPath, string host)
-        {
-            var certificate = new X509Certificate2(certificatePath);
-            var rsa = RSA.Create();
-            var keyContent = File.ReadAllText(privateKeyPath);
-            rsa.ImportFromPem(keyContent);
-            var cspParameters = new CspParameters()
-            {
-                KeyContainerName = host,
-                Flags = CspProviderFlags.UseNonExportableKey,
-            };
-            var rsaPersistent = new RSACryptoServiceProvider(cspParameters);
-            rsaPersistent.ImportParameters(rsa.ExportParameters(true));
-            rsa.Dispose();
-            rsa = rsaPersistent;
-
-            var retVal = certificate.CopyWithPrivateKey(rsa);
-            //var str = ExportToPEM(retVal);
-            return retVal;
-
-        }
-
-        //public static string ExportToPEM(X509Certificate cert)
-        //{
-        //    StringBuilder builder = new StringBuilder();
-
-        //    builder.AppendLine("-----BEGIN CERTIFICATE-----");
-        //    builder.AppendLine(Convert.ToBase64String(cert.Export(X509ContentType.Cert)));
-        //    builder.AppendLine("-----END CERTIFICATE-----");
-
-        //    return builder.ToString();
-        //}
     }
         public static class Setup
         {
