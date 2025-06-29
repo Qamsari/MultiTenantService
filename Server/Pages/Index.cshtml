@@ -1,6 +1,7 @@
 ﻿@page
 @using Server.Services.DataService
 @inject TenantBaseAppDbContext context
+@inject IHttpContextAccessor httpContextAccessor
 @{
 }
 
@@ -18,5 +19,11 @@
         }
         </ul>
     </div>
+    <ul>
+        @foreach(var item in httpContextAccessor.HttpContext.Request.Headers)
+        {
+            <li>@item.Key - @item.Value</li>
+        }
+    </ul>
 </body>
 </html>
