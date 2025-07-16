@@ -221,3 +221,24 @@ tasklist.exe /FI "IMAGENAME EQ nginx.exe"
 
 certbot certonly --webroot -w C:\websites\qaz.ir -d qazanfari.ir --non-interactive --agree-tos --email c3d_lover@yahoo.com --logs-dir C:\websites\qaz.ir\certbot\log  --debug
 certbot certonly --webroot -w C:\nginx-1.27.5\www\certbot -d crm.devolutions.net --non-interactive --agree-tos --email c3d_lover@yahoo.com --logs-dir C:\nginx-1.27.5\www\certbot\log  --debug
+
+certbot certonly --webroot -w C:\nginx-1.28.0\www\bitbug\certbot -d www.bitbug.ir --non-interactive --agree-tos --email c3d_lover@yahoo.com --logs-dir C:\nginx-1.28.0\www\bitbug\logs  --debug -v
+
+sudo visudo
+
+your_username ALL=(ALL) NOPASSWD: /bin/systemctl reload nginx
+your_user ALL=(ALL) NOPASSWD: /usr/sbin/nginx -s reload
+
+uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+Check if the port is open on Windows:
+    netstat -ano | find ":80"
+
+# Find your WSL2 IP
+wsl hostname -I
+
+# Forward port 80 from all interfaces to WSL2 IP
+netsh interface portproxy add v4tov4 listenport=80 listenaddress=0.0.0.0 connectport=80 connectaddress=<WSL2_IP>    
+# Forward port 443 from all interfaces to WSL2 IP
+
+netsh interface portproxy add v4tov4 listenport=443 listenaddress=  

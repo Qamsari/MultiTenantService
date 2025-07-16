@@ -19,7 +19,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapGet("/nginx/start", async (INginxManager manager,CancellationToken cancellationToken ) =>
+app.MapGet("/nginx/start", async (INginxManager manager, CancellationToken cancellationToken) =>
 {
     var result = await manager.TryStartNginxAsync(cancellationToken);
     return string.IsNullOrEmpty(result) ? Results.Ok("nginx started...") : Results.InternalServerError(result);
@@ -29,9 +29,22 @@ app.MapGet("/nginx/quit", async (INginxManager manager, CancellationToken cancel
     var result = await manager.TryQuitNginxAsync(cancellationToken);
     return string.IsNullOrEmpty(result) ? Results.Ok("nginx quite...") : Results.InternalServerError(result);
 });
-app.MapGet("/nginx/reload", async (INginxManager manager, CancellationToken cancellationToken) => {
+app.MapGet("/nginx/reload", async (INginxManager manager, CancellationToken cancellationToken) =>
+{
     var result = await manager.TryReloadNginxAsync(cancellationToken);
     return string.IsNullOrEmpty(result) ? Results.Ok("nginx reloaded...") : Results.InternalServerError(result);
+});
+
+app.MapGet("/nginx/domain/{domainName}", async (INginxManager manager, string domainName, CancellationToken CancellationToken) =>
+    {
+        var result = await manager.TryGetDomainSetting(domainName, CancellationToken).ConfigureAwait(false);
+        return string.IsNullOrEmpty(result) ? Results.NotFound("Related domain settings not found!") : Results.Ok(result);
+    });
+
+app.MapPost("/nginx/domain", async ([FromBody] DomainSettings domainSettings, INginxManager manager, CancellationToken cancelationToken) =>
+{
+    var result = await manager.TryAddOrUpdateDomainAsync(domainSettings, cancelationToken).ConfigureAwait(false);
+    return result.StartsWith("\\n")? Results.Ok(result):Results.InternalServerError(result);
 });
 
 app.MapPost("/domain", (AddDomainRequest request) =>
